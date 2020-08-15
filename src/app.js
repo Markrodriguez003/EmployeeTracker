@@ -111,38 +111,56 @@ function viewEmployees() {
 // ================================================================================
 function addEmployee() {
 
-    console.log("Please enter employee information below when prompted.")
+    console.log("Please enter employee information below when prompted.");
+    let newEmployee = {};
+    let managers = [
+        
+    ]
+
     INQ
         .prompt([
             {
-                name: 'f_name',
+                name: 'firstName',
                 message: "First name:",
             },
             {
-                name: 'l_name',
+                name: 'lastName',
                 message: "Last name:",
             },
             {
+                type: 'list',
                 name: 'role',
-                message: "Job title:",
-
+                choices: [
+                    'Accountant',
+                    'Account Manager',
+                    'Lawyer',
+                    'Lead Engineer',
+                    'Legal Team Lead',
+                    'Salesperson',
+                    'Sales Lead',
+                    'Software Engineer'
+                ]
             },
             {
-                name: 'department',
-                message: "Department",
+                type: 'list',
+                name: 'dept',
+                choices: [
+                    'Finance',
+                    'Legal',
+                    'Engineering',
+                    'Sales'
+                ]
             },
-            {
-                name: 'manager',
-                message: "Manager/Supervisor",
-            },
-            {
-                name: 'salary',
-                message: "Yearly salary",
-            }
         ])
         .then(employeeObj => {
 
-            console.log("Employee Name --> : " + JSON.stringify(employeeObj));
+            newEmployee = { ...employeeObj };
+            console.log("Copying new Object part 1 of 4 -->" + newEmployee.firstName);
+
+            // let newEmployeeRole = viewJobRoles();
+            // console.log(newEmployeeRole);
+            // newEmployee = {newEmployeeRole};
+            // console.log("ADDED STUFF" + JSON.stringify(newEmployee));
 
         }).catch(err => {
             console.log("Error --> Employee object not created " + err);
@@ -166,83 +184,30 @@ function deleteEmployee() {
 // ================================================================================
 // VIEW JOB ROLE OPTIONS 
 // ================================================================================
-function viewJobRoles() {
-    console.log("Select a job role")
-    INQ
-        .prompt([
-            {
-                type: 'list',
-                name: 'view_role_choice',
-                choices: [
-                    'Accountant',
-                    'Account Manager',
-                    'Lawyer',
-                    'Lead Engineer',
-                    'Legal Team Lead',
-                    'Salesperson',
-                    'Sales Lead',
-                    'Software Engineer'
-                ]
-            },
-        ])
-        .then((response) => {
-            if (response.view_role_choice === "Accountant") {
-                console.log("Accountant!");
-                return "Accountant!";
-            } else if (response.view_role_choice === "Account Manager") {
-                console.log("Account Manager!");
-                return "Account Manager";
-            } else if (response.view_role_choice === "Lawyer") {
-                console.log("Lawyer!");
-                return "Lawyer";
-            } else if (response.view_role_choice === "Lead Engineer") {
-                console.log("Lead Engineer!");
-                return "Lead Engineer";
-            } else if (response.view_role_choice === "Legal Team Lead") {
-                console.log("Legal Team Lead!");
-                return "Legal Team Lead";
-            } else if (response.view_role_choice === "Sales Lead") {
-                console.log("Salesperson!");
-                return "Salesperson";
-            } else if (response.view_role_choice === "Sales Lead") {
-                console.log("Sales Lead!");
-                return "Sales Lead";
-            } else if (response.view_role_choice === "Software Engineer") {
-                console.log("Software Engineer!");
-                return "Software Engineer";
-            } else {
-                console.log("Exiting . . . ");
-            }
-        })
-        .catch((err) => {
-            console.log("Error -->> View employee role choice error: " + err);
-        })
-
-}
 
 // Sequelize Sync
-db.sequelize.sync({ force: true }).then((err) => {
-    // instrument array of objects to load instrument table
-    // const instr = [
-    //     { instrument: "guitar" },
-    //     { instrument: "bass" },
-    //     { instrument: "drums" },
-    //     { instrument: "percussion" },
-    //     { instrument: "brass" },
-    //     { instrument: "woodwind" },
-    //     { instrument: "synthesizer" },
-    //     { instrument: "studio" },
-    //     { instrument: "dj" }
-    // ];
+// db.sequelize.sync({ force: true }).then((err) => {
+//     // instrument array of objects to load instrument table
+//     // const instr = [
+//     //     { instrument: "guitar" },
+//     //     { instrument: "bass" },
+//     //     { instrument: "drums" },
+//     //     { instrument: "percussion" },
+//     //     { instrument: "brass" },
+//     //     { instrument: "woodwind" },
+//     //     { instrument: "synthesizer" },
+//     //     { instrument: "studio" },
+//     //     { instrument: "dj" }
+//     // ];
 
-    // db.cb_Instrument.bulkCreate(instr, { validate: true }).then(() => {
-    //     console.log("Instrument loaded");
-    // }).catch((err) => {
-    //     console.log("Failed to load instruments");
-    //     console.log(err);
-    // }).finally(console.log("..."));
+//     // db.cb_Instrument.bulkCreate(instr, { validate: true }).then(() => {
+//     //     console.log("Instrument loaded");
+//     // }).catch((err) => {
+//     //     console.log("Failed to load instruments");
+//     //     console.log(err);
+//     // }).finally(console.log("..."));
 
-});
+// });
 
 // splashGraphic();
 mainMenu();
