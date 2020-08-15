@@ -4,7 +4,8 @@
   "description": "Employee tracking CLI that allows users to store, edit, delete and view registered employees in a table",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seed": "node seeders/seed.js"
   },
   "repository": {
     "type": "git",

@@ -111,6 +111,8 @@ function viewEmployees() {
 // ================================================================================
 function addEmployee() {
 
+    // CREATE ARRAY FOR ROLE/TITLES AND DEPARTMENT
+
     console.log("Please enter employee information below when prompted.");
     let newEmployee = {};
     let managers = [
@@ -129,6 +131,7 @@ function addEmployee() {
             },
             {
                 type: 'list',
+                message: "Job Title:",
                 name: 'role',
                 choices: [
                     'Accountant',
@@ -143,6 +146,7 @@ function addEmployee() {
             },
             {
                 type: 'list',
+                message: "Department:",
                 name: 'dept',
                 choices: [
                     'Finance',
@@ -151,11 +155,24 @@ function addEmployee() {
                     'Sales'
                 ]
             },
+            {
+                type: 'list',
+                message: "Manager:",
+                name: 'fk_manager',
+                choices: [
+                    "null"
+                ]
+            },
+            {
+                name: 'salary',
+                message: "Salary:",
+            },
+
         ])
         .then(employeeObj => {
 
             newEmployee = { ...employeeObj };
-            console.log("Copying new Object part 1 of 4 -->" + newEmployee.firstName);
+            console.log("Copying new Object --> " + JSON.stringify(newEmployee));
 
             // let newEmployeeRole = viewJobRoles();
             // console.log(newEmployeeRole);
@@ -186,28 +203,11 @@ function deleteEmployee() {
 // ================================================================================
 
 // Sequelize Sync
-// db.sequelize.sync({ force: true }).then((err) => {
-//     // instrument array of objects to load instrument table
-//     // const instr = [
-//     //     { instrument: "guitar" },
-//     //     { instrument: "bass" },
-//     //     { instrument: "drums" },
-//     //     { instrument: "percussion" },
-//     //     { instrument: "brass" },
-//     //     { instrument: "woodwind" },
-//     //     { instrument: "synthesizer" },
-//     //     { instrument: "studio" },
-//     //     { instrument: "dj" }
-//     // ];
+db.sequelize.sync({ force: true }).then((err) => {
 
-//     // db.cb_Instrument.bulkCreate(instr, { validate: true }).then(() => {
-//     //     console.log("Instrument loaded");
-//     // }).catch((err) => {
-//     //     console.log("Failed to load instruments");
-//     //     console.log(err);
-//     // }).finally(console.log("..."));
 
-// });
+});
+
 
 // splashGraphic();
 mainMenu();

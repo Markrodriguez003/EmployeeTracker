@@ -15,10 +15,10 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         });
 
-        // employee.belongsTo(models.manager, {
-        //     foreignKey: 'fk_manager',
-        //     allowNull: false
-        // });
+        employee.hasOne(models.employee, {
+            foreignKey: 'fk_manager',
+            allowNull: true
+        });
     };
 
     return employee;
