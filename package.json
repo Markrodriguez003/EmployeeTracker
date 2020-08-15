@@ -1,0 +1,33 @@
+{
+  "name": "employeetracker",
+  "version": "1.0.0",
+  "description": "Employee tracking CLI that allows users to store, edit, delete and view registered employees in a table",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Markrodriguez003/EmployeeTracker.git"
+  },
+  "keywords": [
+    "Employee",
+    "tracker",
+    "database",
+    "SQL",
+    "Inquirer",
+    "employee-table"
+  ],
+  "author": "Mark Anthony Patrick Rodriguez (markrodriguez003@gmail.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Markrodriguez003/EmployeeTracker/issues"
+  },
+  "homepage": "https://github.com/Markrodriguez003/EmployeeTracker#readme",
+  "dependencies": {
+    "figlet": "^1.5.0",
+    "inquirer": "^7.3.3",
+    "mysql2": "^2.1.0",
+    "sequelize": "^6.3.4"
+  }
+}
