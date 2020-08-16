@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
         lastName: {
             type: DataTypes.STRING(30)
         }
-    });
+    }, { timestamps: false, });
 
     employee.associate = (models) => {
         employee.belongsTo(models.role, {
@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         });
 
-        employee.hasOne(models.employee, {
+        employee.belongsTo(models.employee, {
             foreignKey: 'fk_manager',
             allowNull: true
         });
