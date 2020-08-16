@@ -6,7 +6,55 @@ const { clear } = require("console"); // ? Does this work ??
 // Grabs our DB and its models
 const db = require("../models");
 
-// const DB_CALLS = require("");
+
+// PRELIMINARY LOADING FUNCTIONS AND DB CALLS
+// GLOBAL VARIABLES
+let managersArry = [{ name: "None", managerID: null },];
+let roleArry = [{ name: "None", roleID: null, fkSalary: 0, fkDept: 0 }];
+let deptArry = [{ name: "None", deptId: 0 }];
+
+// --------------------------------------------------------------------------------------------------
+//  FINDS ALL MANAGERS WITH THEIR CORRESPONDING FK_ID AND PLACES IT IN AN ARRAY FOR LATER USE
+// --------------------------------------------------------------------------------------------------
+
+db.employee.findAll({ raw: true })
+    .then(mObj => {
+        mObj.forEach((o, i) => {
+            let oPlaceholder = { name: o.firstName + " " + o.lastName, managerID: o.id }
+            managersArry.push(oPlaceholder);
+        })
+    })
+    .catch(err => {
+        console.log("MANAGER REF ERROR::::" + err);
+    });
+
+// --------------------------------------------------------------------------------------------------
+// FINDS ALL ROLES AND PLACES IT IN AN ARRAY FOR LATER USE
+// --------------------------------------------------------------------------------------------------
+
+db.role.findAll({ raw: true })
+    .then(rObj => {
+        rObj.forEach((o, i) => {
+            let rPlaceholder = { name: o.title, roleID: o.id, fkSalary: o.salary, fkDept: o.dept }
+            roleArry.push(rPlaceholder);
+        })
+    })
+    .catch(err => {
+        console.log("ROLE REF ERROR::::" + err);
+    });
+
+    // --------------------------------------------------------------------------------------------------
+// FINDS ALL DEPARTMENTS 
+// --------------------------------------------------------------------------------------------------
+
+db.department.findAll({ raw: true })
+    .then(d => {
+        d.forEach((o) => {
+            let deptPlaceholder = { name: o.dept, deptId: o.id }
+            deptArry.push(deptPlaceholder);
+        })
+
+    })
 
 // ================================================================================
 // SPLASH GRAPHIC
@@ -41,21 +89,24 @@ function mainMenu() { // INITIAL MAIN MENU
                 type: 'list',
                 name: 'main_menu_choice',
                 message: 'Welcome to Employee Tracker. Please pick from the choices below',
-                choices: ['Instructions', 'View Employees', 'Add New Employee', "Edit Employee", "Exit"]
+                choices: ['Instructions', 'View Employees', 'Add New Employee', "Edit Employee", "Add New Job Role", "Add New Department", "Exit"]
             },
         ])
         .then((response) => {
             if (response.main_menu_choice === "Instructions") {
                 console.log("Instructions!");
             } else if (response.main_menu_choice === "View Employees") {
-                console.log("Viewing!");
                 clear();
                 viewEmployees();
             } else if (response.main_menu_choice === "Add New Employee") {
-                console.log("Adding!");
+                clear();
                 addEmployee();
             } else if (response.main_menu_choice === "Edit Employee") {
-                console.log("Editing! ");
+                console.log("Editing employee");
+            } else if (response.main_menu_choice === "Add New Job Role") {
+                insertJobRole();
+            } else if (response.main_menu_choice === "Add New Department") {
+                insertDept();
             } else {
                 console.log("Exiting . . . ");
             }
@@ -112,12 +163,13 @@ function viewEmployees() {
 function addEmployee() {
 
     // CREATE ARRAY FOR ROLE/TITLES AND DEPARTMENT
+    //SQL COMMAND HERE TO LOAD MANAGERS INTO MANAGERS ARRAY
 
     console.log("Please enter employee information below when prompted.");
-    let newEmployee = {};
-    let managers = [
-        
-    ]
+    // let x = []
+    // let rArry = roleArry.forEach(o=>{
+    //     x.push(o.fkRole);
+    // })
 
     INQ
         .prompt([
@@ -132,36 +184,20 @@ function addEmployee() {
             {
                 type: 'list',
                 message: "Job Title:",
-                name: 'role',
-                choices: [
-                    'Accountant',
-                    'Account Manager',
-                    'Lawyer',
-                    'Lead Engineer',
-                    'Legal Team Lead',
-                    'Salesperson',
-                    'Sales Lead',
-                    'Software Engineer'
-                ]
+                name: 'fk_role',
+                choices: roleArry
             },
             {
                 type: 'list',
                 message: "Department:",
                 name: 'dept',
-                choices: [
-                    'Finance',
-                    'Legal',
-                    'Engineering',
-                    'Sales'
-                ]
+                choices: deptArry
             },
             {
                 type: 'list',
                 message: "Manager:",
                 name: 'fk_manager',
-                choices: [
-                    "null"
-                ]
+                choices: managersArry
             },
             {
                 name: 'salary',
@@ -170,14 +206,25 @@ function addEmployee() {
 
         ])
         .then(employeeObj => {
+            let manager_id = managersArry.find((o, i) => { return employeeObj.fk_manager === o.name })
+            let role_id = roleArry.find((o, i) => { return employeeObj.fk_role === o.name })
 
-            newEmployee = { ...employeeObj };
-            console.log("Copying new Object --> " + JSON.stringify(newEmployee));
 
-            // let newEmployeeRole = viewJobRoles();
-            // console.log(newEmployeeRole);
-            // newEmployee = {newEmployeeRole};
-            // console.log("ADDED STUFF" + JSON.stringify(newEmployee));
+            // CREATES NEW EMPLOYEE OBJECT TO BE INSERTED INTO EMPLOYEE TABLE
+            newEmployee = {
+                firstName: employeeObj.firstName,
+                lastName: employeeObj.lastName,
+                fk_role: role_id.roleID,
+                dept: employeeObj.dept,
+                fk_manager: manager_id.managerID,
+                salary: employeeObj.salary
+            };
+
+            // INSERTS NEW EMPLOYEE INTO EMPLOYEE TABLE INTO DATABASE 
+            db.employee.create(newEmployee).then(() => { console.log("NEW EMPLOYEE ADDED!") });
+            clear();
+            mainMenu();
+
 
         }).catch(err => {
             console.log("Error --> Employee object not created " + err);
@@ -199,14 +246,81 @@ function deleteEmployee() {
 }
 
 // ================================================================================
-// VIEW JOB ROLE OPTIONS 
+// ADD NEW EMPLOYEE JOB ROLE 
 // ================================================================================
+function insertJobRole() {
+    INQ
+        .prompt([
+            {
+                name: 'role',
+                message: "Insert New Role:",
+            },
+            {
+                name: 'salary',
+                message: "Insert New salary:",
+            },
+            {
+                type: 'list',
+                message: "Choose Department assigned to Role:",
+                name: 'dept',
+                choices: deptArry
+            },
 
-// Sequelize Sync
-db.sequelize.sync({ force: true }).then((err) => {
+        ])
+        .then(obj => {
+
+            let dId = deptArry.find(o => {
+                if (obj.dept === o.name) { return o.deptId; }
+            })
+
+            let newRoleObject = {
+                title: obj.role,
+                salary: obj.salary,
+                fk_department: dId.deptId
+            }
+
+            // INSERTS NEW EMPLOYEE ROLE INTO ROLE TABLE INTO DATABASE 
+            db.role.create(newRoleObject).then(() => { console.log("NEW EMPLOYEE ROLE ADDED!") });
+            clear();
+            mainMenu();
 
 
-});
+        }).catch(err => {
+            console.log("Error --> Employee Role object not created " + err);
+        });
+}
+
+
+// ================================================================================
+// ADD NEW DEPARTMENT
+// ================================================================================
+// deptArry
+function insertDept() {
+    INQ
+        .prompt([
+            {
+                name: 'dept',
+                message: "Insert New Department:",
+            },
+
+
+        ])
+        .then(obj => {
+
+            // INSERTS NEW DEPARTMENT  INTO DEPARTMENT TABLE INTO DATABASE 
+            db.department.create(obj).then(() => { console.log("NEW DEPARTMENT ADDED!") });
+            clear();
+            mainMenu();
+
+
+
+        }).catch(err => {
+            console.log("Error --> Department object not created " + err);
+        });
+
+
+}
+
 
 
 // splashGraphic();
