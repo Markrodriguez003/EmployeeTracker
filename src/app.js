@@ -31,12 +31,15 @@ function reloadDB() {
             mObj.forEach((o, i) => {
                 let oPlaceholder = {
                     managerID: o.id,
+                    name: o.firstName + " " +  o.lastName, 
                     fName: o.firstName,
+                    lName: o.lastName,
                     fkRole: o.fk_role,
                     id: o.id
                 }
                 managersArry.push(oPlaceholder); //Loads Array for Managers
             })
+
         })
         .catch(err => {
             console.log("MANAGER REF ERROR::::" + err);
@@ -124,8 +127,6 @@ function splashGraphic() {
         console.log(data);
         console.log(banner);
         console.log(" ");
-
-
     });
 }
 
@@ -201,6 +202,7 @@ function printDeptTable() {
 // VIEW EMPLOYEES TABLE OPTIONS
 // ================================================================================
 function viewEmployees() {
+    reloadDB();
     INQ
         .prompt([
             {
@@ -247,7 +249,7 @@ function viewEmployees() {
 // ADD EMPLOYEE 
 // ================================================================================
 function addEmployee() {
-
+    reloadDB();
     // CREATE ARRAY FOR ROLE/TITLES AND DEPARTMENT
     console.log("Please enter employee information below when prompted.");
     INQ
@@ -290,6 +292,7 @@ function addEmployee() {
             // CREATES NEW EMPLOYEE OBJECT TO BE INSERTED INTO EMPLOYEE TABLE
             newEmployee = {
                 firstName: employeeObj.firstName,
+                lastName: employeeObj.lastName,
                 fk_role: role_id.roleID,
                 dept: employeeObj.dept,
                 fk_manager: manager_id.managerID,
@@ -327,6 +330,7 @@ function deleteEmployee() {
 // ADD NEW EMPLOYEE JOB ROLE 
 // ================================================================================
 function insertJobRole() {
+    reloadDB();
     INQ
         .prompt([
             {
@@ -376,6 +380,7 @@ function insertJobRole() {
 // ================================================================================
 // deptArry
 function insertDept() {
+    reloadDB();
     INQ
         .prompt([
             {
