@@ -100,7 +100,6 @@ function reloadDB() {
                 deptArry.push(deptPlaceholder);
             })
         })
-
 }
 // ================================================================================
 // SPLASH GRAPHIC
@@ -140,14 +139,14 @@ function mainMenu() { // INITIAL MAIN MENU
                 type: 'list',
                 name: 'main_menu_choice',
                 message: 'Welcome to Employee Tracker. Please pick from the choices below',
-                choices: ['View Employees', 'Add New Employee', "Add New Job Role", "Add New Department", "Edit Employee Role", "Exit"]
+                choices: ['View Data Tables', 'Add New Employee', "Add New Job Role", "Add New Department", "Edit Employee Role", "Exit"]
             },
         ])
         .then((response) => {
-            if (response.main_menu_choice === "View Employees") {
+            if (response.main_menu_choice === "View Data Tables") {
                 reloadDB();
                 clear();
-                setTimeout(viewEmployees, 700);
+                setTimeout(viewDataTables, 700);
             } else if (response.main_menu_choice === "Add New Employee") {
                 reloadDB();
                 clear();
@@ -179,6 +178,27 @@ function mainMenu() { // INITIAL MAIN MENU
 function printEmployeeTable() {
     const table = empTable.getTable(employeeArry);
     console.log(table);
+
+    INQ
+        .prompt([
+            {
+                type: 'list',
+                name: 'main_menu_choice',
+                choices: ["Return to Main Menu", "Exit"]
+            },
+        ])
+        .then((response) => {
+            if (response.main_menu_choice === "Return to Main Menu") {
+                reloadDB();
+                clear();
+                setTimeout(mainMenu, 700);
+            } else if (response.main_menu_choice === "Exit") {
+                clear();
+                console.log("Exiting . . . ");
+            }
+        }).catch(err => {
+            console.log("An error has occured -->: " + err)
+        })
 }
 // ================================================================================
 // VIEW ROLE TABLE
@@ -186,6 +206,27 @@ function printEmployeeTable() {
 function printRoleTable() {
     const table = empTable.getTable(roleArry);
     console.log(table);
+
+    INQ
+        .prompt([
+            {
+                type: 'list',
+                name: 'main_menu_choice',
+                choices: ["Return to Main Menu", "Exit"]
+            },
+        ])
+        .then((response) => {
+            if (response.main_menu_choice === "Return to Main Menu") {
+                reloadDB();
+                clear();
+                setTimeout(mainMenu, 700);
+            } else if (response.main_menu_choice === "Exit") {
+                clear();
+                console.log("Exiting . . . ");
+            }
+        }).catch(err => {
+            console.log("An error has occured -->: " + err)
+        })
 }
 
 // ================================================================================
@@ -194,12 +235,32 @@ function printRoleTable() {
 function printDeptTable() {
     const table = empTable.getTable(deptArry);
     console.log(table);
+    INQ
+        .prompt([
+            {
+                type: 'list',
+                name: 'main_menu_choice',
+                choices: ["Return to Main Menu", "Exit"]
+            },
+        ])
+        .then((response) => {
+            if (response.main_menu_choice === "Return to Main Menu") {
+                reloadDB();
+                clear();
+                setTimeout(mainMenu, 700);
+            } else if (response.main_menu_choice === "Exit") {
+                clear();
+                console.log("Exiting . . . ");
+            }
+        }).catch(err => {
+            console.log("An error has occured -->: " + err)
+        })
 }
 
 // ================================================================================
 // VIEW EMPLOYEES TABLE OPTIONS
 // ================================================================================
-function viewEmployees() {
+function viewDataTables() {
     reloadDB();
     INQ
         .prompt([
@@ -464,7 +525,7 @@ function insertDept() {
 }
 
 
-// splashGraphic();
+splashGraphic();
 reloadDB();
 setTimeout(mainMenu, 1500);
 
