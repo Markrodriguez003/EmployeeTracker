@@ -1,5 +1,6 @@
-const INQ = require("inquirer"); // Bring in inquire module
-const FIG = require("figlet");
+const INQ = require("inquirer"); // Bring in inquirer module for user prompts
+const FIG = require("figlet");   // Bring in Figlet for ASCII graphics
+const empTable = require('console.table');
 
 const { clear } = require("console"); // ? Does this work ??
 
@@ -9,11 +10,18 @@ const db = require("../models");
 
 // GLOBAL VARIABLES
 let managersArry = [{ name: "None", managerID: null },];
+let employeeArry = [];
 let roleArry = [{ name: "None", roleID: null, fkSalary: 0, fkDept: 0 }];
 let deptArry = [{ name: "None", deptId: 0 }];
 
 // PRELIMINARY LOADING FUNCTIONS AND DB CALLS
 function reloadDB() {
+    // CLEARS GLOBAL VARIABLES
+    managersArry = [{ name: "None", managerID: null },];
+    employeeArry = [];
+    roleArry = [{ name: "None", roleID: null, fkSalary: 0, fkDept: 0 }];
+    deptArry = [{ name: "None", deptId: 0 }];
+
     // --------------------------------------------------------------------------------------------------
     //  FINDS ALL MANAGERS WITH THEIR CORRESPONDING FK_ID AND PLACES IT IN AN ARRAY FOR LATER USE
     // --------------------------------------------------------------------------------------------------
@@ -22,14 +30,12 @@ function reloadDB() {
         .then(mObj => {
             mObj.forEach((o, i) => {
                 let oPlaceholder = {
-                    name: o.firstName + " " + o.lastName,
                     managerID: o.id,
                     fName: o.firstName,
-                    lName: o.lastName,
                     fkRole: o.fk_role,
                     id: o.id
                 }
-                managersArry.push(oPlaceholder);
+                managersArry.push(oPlaceholder); //Loads Array for Managers
             })
         })
         .catch(err => {
@@ -58,12 +64,36 @@ function reloadDB() {
         });
 
     // --------------------------------------------------------------------------------------------------
+    // FINDS ALL DEPARTMENTS, ROLES, EMPLOYEES -- FOR VIEWING TABLES 
+    // --------------------------------------------------------------------------------------------------
+    db.employee.findAll({
+
+        include: [db.role],
+        // where: {
+        //     fk_instrument: instrIndex
+        // },
+        raw: true
+    })
+        .then(entireDB => {
+            entireDB.forEach((o, i) => {
+                let tPlaceholder = {
+                    Employee_Id: o.id,
+                    First_Name: o.firstName,
+                    Last_Name: o.lastName,
+                    Job_Title: o["role.title"],
+                }
+                employeeArry.push(tPlaceholder);
+            })
+        });
+
+
+    // --------------------------------------------------------------------------------------------------
     // FINDS ALL DEPARTMENTS 
     // --------------------------------------------------------------------------------------------------
 
     db.department.findAll({ raw: true })
-        .then(d => {
-            d.forEach((o) => {
+        .then(dep => {
+            dep.forEach((o, i) => {
                 let deptPlaceholder = { name: o.dept, deptId: o.id }
                 deptArry.push(deptPlaceholder);
             })
@@ -75,7 +105,7 @@ function reloadDB() {
 // ================================================================================
 
 function splashGraphic() {
-    
+
     const banner = "||************************************************************************||";
     FIG.text('EMPLOYEE TRACKER', {
         font: 'stick letters',
@@ -144,9 +174,31 @@ function mainMenu() { // INITIAL MAIN MENU
             console.log("Error -->> Main menu choice error: " + err);
         })
 }
-
 // ================================================================================
 // VIEW EMPLOYEES TABLE
+// ================================================================================
+function printEmployeeTable() {
+    const table = empTable.getTable(employeeArry);
+    console.log(table);
+}
+// ================================================================================
+// VIEW ROLE TABLE
+// ================================================================================
+function printRoleTable() {
+    const table = empTable.getTable(roleArry);
+    console.log(table);
+}
+
+// ================================================================================
+// VIEW DEPARTMENT TABLE
+// ================================================================================
+function printDeptTable() {
+    const table = empTable.getTable(deptArry);
+    console.log(table);
+}
+
+// ================================================================================
+// VIEW EMPLOYEES TABLE OPTIONS
 // ================================================================================
 function viewEmployees() {
     INQ
@@ -157,22 +209,25 @@ function viewEmployees() {
                 message: 'Please pick from the choices below',
                 choices: [
                     'View all employees',
-                    'View all Employees by department',
-                    'View all Employees by manager',
-                    'View all Employees by salary',
+                    'View all departments',
+                    'View all employee roles',
                     'Return to main menu',
                     'Exit']
             },
         ])
         .then((response) => {
             if (response.view_menu_choice === "View all employees") {
-                console.log("View all employees!");
-            } else if (response.view_menu_choice === "View all Employees by department") {
-                console.log("View all Employees by department!");
-            } else if (response.view_menu_choice === "View all Employees by manager") {
-                console.log("View all Employees by manager");
-            } else if (response.view_menu_choice === "View all Employees by salary") {
-                console.log("View all Employees by salary! ");
+                console.log("EMPLOYEE TABLE:");
+                console.log("--------------------------------------------------------");
+                setTimeout(printEmployeeTable, 300);
+            } else if (response.view_menu_choice === "View all departments") {
+                console.log("DEPARTMENT TABLE:");
+                console.log("--------------------------------------------------------");
+                setTimeout(printDeptTable, 300);
+            } else if (response.view_menu_choice === "View all employee roles") {
+                console.log("ROLE TABLE:");
+                console.log("--------------------------------------------------------");
+                setTimeout(printRoleTable, 300);
             } else if (response.view_menu_choice === "Return to main menu") {
                 console.log("Return to main menu! ");
                 clear();
@@ -201,8 +256,7 @@ function addEmployee() {
                 name: 'firstName',
                 message: "First name:",
             },
-            {
-                name: 'lastName',
+            {   name: 'lastName',
                 message: "Last name:",
             },
             {
@@ -233,11 +287,9 @@ function addEmployee() {
             let manager_id = managersArry.find((o, i) => { return employeeObj.fk_manager === o.name })
             let role_id = roleArry.find((o, i) => { return employeeObj.fk_role === o.name })
 
-
             // CREATES NEW EMPLOYEE OBJECT TO BE INSERTED INTO EMPLOYEE TABLE
             newEmployee = {
                 firstName: employeeObj.firstName,
-                lastName: employeeObj.lastName,
                 fk_role: role_id.roleID,
                 dept: employeeObj.dept,
                 fk_manager: manager_id.managerID,
@@ -330,8 +382,6 @@ function insertDept() {
                 name: 'dept',
                 message: "Insert New Department:",
             },
-
-
         ])
         .then(obj => {
 
@@ -341,20 +391,14 @@ function insertDept() {
             reloadDB();
             clear();
             setTimeout(mainMenu, 700);
-
-
-
         }).catch(err => {
             console.log("Error --> Department object not created " + err);
         });
-
-
 }
-
 
 
 splashGraphic();
 reloadDB();
-setTimeout( mainMenu, 1500);
+setTimeout(mainMenu, 1500);
 
 
