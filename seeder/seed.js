@@ -3,10 +3,10 @@
 const db = require("../models");
 
 // Employee Seeds
-module.exports.seed = 
+module.exports.seed =
 
 
-console.log("LOADING SEEDS")
+    console.log("LOADING SEEDS")
 
 // EXAMPLE EMPLOYEE SEEDS
 let employeeSeeds = [
@@ -42,13 +42,13 @@ let roleSeeds = [
     { title: 'Graphic Designer', salary: 52000.00, fk_department: 5 },
     { title: 'Graphic Designer Lead', salary: 58000.00, fk_department: 5 },
 ];
- 
+
 db.sequelize.sync({ force: true }).then((err) => {
 
-   
+
     //-----------------------------------------------------------
     // LOADING DEPARTMENT SEEDS || IMPORTANT
-    db.department.bulkCreate(deptSeeds, {   }).then(() => {
+    db.department.bulkCreate(deptSeeds, {}).then(() => {
         console.log("Department seeds loaded");
     }).catch((err) => {
         console.log("Failed to load departments");
@@ -57,7 +57,7 @@ db.sequelize.sync({ force: true }).then((err) => {
 
     //-----------------------------------------------------------
     // LOADING ROLE SEEDS || IMPORTANT
-    db.role.bulkCreate(roleSeeds, {   }).then(() => {
+    db.role.bulkCreate(roleSeeds, {}).then(() => {
         console.log("Role seeds loaded");
     }).catch((err) => {
         console.log("Failed to load roles");
@@ -66,7 +66,7 @@ db.sequelize.sync({ force: true }).then((err) => {
 
     //-----------------------------------------------------------
     // LOADING EMPLOYEE SEEDS (EXAMPLE EMPLOYEES) 
-    function loadExampleEmployees(){
+    function loadExampleEmployees() {
         db.employee.bulkCreate(employeeSeeds, {}).then(() => {
             console.log("Employee seeds loaded");
         }).catch((err) => {

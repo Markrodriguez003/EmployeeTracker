@@ -7,61 +7,76 @@ const { clear } = require("console"); // ? Does this work ??
 const db = require("../models");
 
 
-// PRELIMINARY LOADING FUNCTIONS AND DB CALLS
 // GLOBAL VARIABLES
 let managersArry = [{ name: "None", managerID: null },];
 let roleArry = [{ name: "None", roleID: null, fkSalary: 0, fkDept: 0 }];
 let deptArry = [{ name: "None", deptId: 0 }];
 
-// --------------------------------------------------------------------------------------------------
-//  FINDS ALL MANAGERS WITH THEIR CORRESPONDING FK_ID AND PLACES IT IN AN ARRAY FOR LATER USE
-// --------------------------------------------------------------------------------------------------
+// PRELIMINARY LOADING FUNCTIONS AND DB CALLS
+function reloadDB() {
+    // --------------------------------------------------------------------------------------------------
+    //  FINDS ALL MANAGERS WITH THEIR CORRESPONDING FK_ID AND PLACES IT IN AN ARRAY FOR LATER USE
+    // --------------------------------------------------------------------------------------------------
 
-db.employee.findAll({ raw: true })
-    .then(mObj => {
-        mObj.forEach((o, i) => {
-            let oPlaceholder = { name: o.firstName + " " + o.lastName, managerID: o.id }
-            managersArry.push(oPlaceholder);
+    db.employee.findAll({ raw: true })
+        .then(mObj => {
+            mObj.forEach((o, i) => {
+                let oPlaceholder = {
+                    name: o.firstName + " " + o.lastName,
+                    managerID: o.id,
+                    fName: o.firstName,
+                    lName: o.lastName,
+                    fkRole: o.fk_role,
+                    id: o.id
+                }
+                managersArry.push(oPlaceholder);
+            })
         })
-    })
-    .catch(err => {
-        console.log("MANAGER REF ERROR::::" + err);
-    });
-
-// --------------------------------------------------------------------------------------------------
-// FINDS ALL ROLES AND PLACES IT IN AN ARRAY FOR LATER USE
-// --------------------------------------------------------------------------------------------------
-
-db.role.findAll({ raw: true })
-    .then(rObj => {
-        rObj.forEach((o, i) => {
-            let rPlaceholder = { name: o.title, roleID: o.id, fkSalary: o.salary, fkDept: o.dept }
-            roleArry.push(rPlaceholder);
-        })
-    })
-    .catch(err => {
-        console.log("ROLE REF ERROR::::" + err);
-    });
+        .catch(err => {
+            console.log("MANAGER REF ERROR::::" + err);
+        });
 
     // --------------------------------------------------------------------------------------------------
-// FINDS ALL DEPARTMENTS 
-// --------------------------------------------------------------------------------------------------
+    // FINDS ALL ROLES AND PLACES IT IN AN ARRAY FOR LATER USE
+    // --------------------------------------------------------------------------------------------------
 
-db.department.findAll({ raw: true })
-    .then(d => {
-        d.forEach((o) => {
-            let deptPlaceholder = { name: o.dept, deptId: o.id }
-            deptArry.push(deptPlaceholder);
+    db.role.findAll({ raw: true })
+        .then(rObj => {
+            rObj.forEach((o, i) => {
+                let rPlaceholder = {
+                    name: o.title,
+                    roleID: o.id,
+                    fkSalary: o.salary,
+                    fkDept: o.dept
+                }
+
+                roleArry.push(rPlaceholder);
+            })
+        })
+        .catch(err => {
+            console.log("ROLE REF ERROR::::" + err);
+        });
+
+    // --------------------------------------------------------------------------------------------------
+    // FINDS ALL DEPARTMENTS 
+    // --------------------------------------------------------------------------------------------------
+
+    db.department.findAll({ raw: true })
+        .then(d => {
+            d.forEach((o) => {
+                let deptPlaceholder = { name: o.dept, deptId: o.id }
+                deptArry.push(deptPlaceholder);
+            })
         })
 
-    })
-
+}
 // ================================================================================
 // SPLASH GRAPHIC
 // ================================================================================
 
 function splashGraphic() {
-    clear();
+    
+    const banner = "||************************************************************************||";
     FIG.text('EMPLOYEE TRACKER', {
         font: 'stick letters',
         // horizontalLayout: 'full',
@@ -74,7 +89,13 @@ function splashGraphic() {
             console.dir(err);
             return;
         }
+        console.log(" ");
+        console.log(banner);
         console.log(data);
+        console.log(banner);
+        console.log(" ");
+
+
     });
 }
 
@@ -83,6 +104,7 @@ function splashGraphic() {
 // ================================================================================
 function mainMenu() { // INITIAL MAIN MENU
     // ascii_art_generator.bar();
+    clear();
     INQ
         .prompt([
             {
@@ -96,17 +118,24 @@ function mainMenu() { // INITIAL MAIN MENU
             if (response.main_menu_choice === "Instructions") {
                 console.log("Instructions!");
             } else if (response.main_menu_choice === "View Employees") {
+                reloadDB();
                 clear();
-                viewEmployees();
+                setTimeout(viewEmployees, 700);
             } else if (response.main_menu_choice === "Add New Employee") {
+                reloadDB();
                 clear();
-                addEmployee();
+                setTimeout(addEmployee, 700);
             } else if (response.main_menu_choice === "Edit Employee") {
                 console.log("Editing employee");
             } else if (response.main_menu_choice === "Add New Job Role") {
-                insertJobRole();
+                reloadDB();
+                clear();
+                setTimeout(insertJobRole, 700);
             } else if (response.main_menu_choice === "Add New Department") {
-                insertDept();
+                reloadDB();
+                clear();
+                setTimeout(insertDept, 700);
+
             } else {
                 console.log("Exiting . . . ");
             }
@@ -147,7 +176,9 @@ function viewEmployees() {
             } else if (response.view_menu_choice === "Return to main menu") {
                 console.log("Return to main menu! ");
                 clear();
-                mainMenu();
+                reloadDB();
+                clear();
+                setTimeout(mainMenu, 700);
             } else {
                 console.log("Exiting . . . ");
             }
@@ -163,14 +194,7 @@ function viewEmployees() {
 function addEmployee() {
 
     // CREATE ARRAY FOR ROLE/TITLES AND DEPARTMENT
-    //SQL COMMAND HERE TO LOAD MANAGERS INTO MANAGERS ARRAY
-
     console.log("Please enter employee information below when prompted.");
-    // let x = []
-    // let rArry = roleArry.forEach(o=>{
-    //     x.push(o.fkRole);
-    // })
-
     INQ
         .prompt([
             {
@@ -223,7 +247,9 @@ function addEmployee() {
             // INSERTS NEW EMPLOYEE INTO EMPLOYEE TABLE INTO DATABASE 
             db.employee.create(newEmployee).then(() => { console.log("NEW EMPLOYEE ADDED!") });
             clear();
-            mainMenu();
+            reloadDB();
+            clear();
+            setTimeout(mainMenu, 700);
 
 
         }).catch(err => {
@@ -282,7 +308,9 @@ function insertJobRole() {
             // INSERTS NEW EMPLOYEE ROLE INTO ROLE TABLE INTO DATABASE 
             db.role.create(newRoleObject).then(() => { console.log("NEW EMPLOYEE ROLE ADDED!") });
             clear();
-            mainMenu();
+            reloadDB();
+            clear();
+            setTimeout(mainMenu, 700);
 
 
         }).catch(err => {
@@ -310,7 +338,9 @@ function insertDept() {
             // INSERTS NEW DEPARTMENT  INTO DEPARTMENT TABLE INTO DATABASE 
             db.department.create(obj).then(() => { console.log("NEW DEPARTMENT ADDED!") });
             clear();
-            mainMenu();
+            reloadDB();
+            clear();
+            setTimeout(mainMenu, 700);
 
 
 
@@ -323,8 +353,8 @@ function insertDept() {
 
 
 
-// splashGraphic();
-mainMenu();
-
+splashGraphic();
+reloadDB();
+setTimeout( mainMenu, 1500);
 
 
