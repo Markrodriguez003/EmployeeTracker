@@ -31,7 +31,7 @@ function reloadDB() {
             mObj.forEach((o, i) => {
                 let oPlaceholder = {
                     managerID: o.id,
-                    name: o.firstName + " " +  o.lastName, 
+                    name: o.firstName + " " + o.lastName,
                     fName: o.firstName,
                     lName: o.lastName,
                     fkRole: o.fk_role,
@@ -89,7 +89,6 @@ function reloadDB() {
             })
         });
 
-
     // --------------------------------------------------------------------------------------------------
     // FINDS ALL DEPARTMENTS 
     // --------------------------------------------------------------------------------------------------
@@ -129,7 +128,6 @@ function splashGraphic() {
         console.log(" ");
     });
 }
-
 // ================================================================================
 // MAIN MENU
 // ================================================================================
@@ -142,13 +140,11 @@ function mainMenu() { // INITIAL MAIN MENU
                 type: 'list',
                 name: 'main_menu_choice',
                 message: 'Welcome to Employee Tracker. Please pick from the choices below',
-                choices: ['Instructions', 'View Employees', 'Add New Employee', "Edit Employee", "Add New Job Role", "Add New Department", "Exit"]
+                choices: ['View Employees', 'Add New Employee', "Add New Job Role", "Add New Department", "Edit Employee Role", "Exit"]
             },
         ])
         .then((response) => {
-            if (response.main_menu_choice === "Instructions") {
-                console.log("Instructions!");
-            } else if (response.main_menu_choice === "View Employees") {
+            if (response.main_menu_choice === "View Employees") {
                 reloadDB();
                 clear();
                 setTimeout(viewEmployees, 700);
@@ -156,8 +152,10 @@ function mainMenu() { // INITIAL MAIN MENU
                 reloadDB();
                 clear();
                 setTimeout(addEmployee, 700);
-            } else if (response.main_menu_choice === "Edit Employee") {
-                console.log("Editing employee");
+            } else if (response.main_menu_choice === "Edit Employee Role") {
+                reloadDB();
+                clear();
+                setTimeout(updateRole, 700);
             } else if (response.main_menu_choice === "Add New Job Role") {
                 reloadDB();
                 clear();
@@ -258,7 +256,8 @@ function addEmployee() {
                 name: 'firstName',
                 message: "First name:",
             },
-            {   name: 'lastName',
+            {
+                name: 'lastName',
                 message: "Last name:",
             },
             {
@@ -374,6 +373,69 @@ function insertJobRole() {
         });
 }
 
+// ================================================================================
+// UPDATE EMPLOYEE JOB ROLE 
+// ================================================================================
+function updateRole() {
+    INQ
+        .prompt([
+            {
+                type: 'list',
+                message: "Choose Role to:",
+                name: 'rolePick',
+                choices: roleArry
+            },
+            {
+                name: 'role',
+                message: "Insert new role title:",
+            },
+            {
+                name: 'salary',
+                message: "Insert new role default salary:",
+            },
+            {
+                type: 'list',
+                message: "Choose Department belonging to edited role:",
+                name: 'dept',
+                choices: deptArry
+            }
+        ])
+        .then(obj => {
+
+            let newDept_id = deptArry.find((o, i) => { return o.name === obj.dept })
+            let newRole_id = roleArry.find((o, i) => { return o.name === obj.rolePick })
+
+            // let testObj = {
+            //     title: obj.role,
+            //     salary: obj.salary,
+            //     fk_department: newDept_id["deptId"],
+            // }
+
+
+            db.role.update(
+                {
+                    title: obj.role,
+                    salary: obj.salary,
+                    fk_department: newDept_id["deptId"],
+                },
+                { where: { id: newRole_id["roleID"] } });
+
+
+
+            clear();
+            reloadDB();
+            clear();
+            console.log("Employee Role Updated!")
+            setTimeout(mainMenu, 700);
+
+
+        }).catch(err => {
+            console.log("Error --> Employee Role object not created " + err);
+        });
+}
+
+
+
 
 // ================================================================================
 // ADD NEW DEPARTMENT
@@ -402,7 +464,7 @@ function insertDept() {
 }
 
 
-splashGraphic();
+// splashGraphic();
 reloadDB();
 setTimeout(mainMenu, 1500);
 

@@ -2,11 +2,16 @@
 // Grabs our DB and its models
 const db = require("../models");
 
+const { clear } = require("console"); 
+
 // Employee Seeds
 module.exports.seed =
 
+    clear();
+    console.log("*******************************************");
+    console.log("LOADING SEEDS");
+    console.log("*******************************************");
 
-    console.log("LOADING SEEDS")
 
 // EXAMPLE EMPLOYEE SEEDS
 let employeeSeeds = [
@@ -53,7 +58,7 @@ db.sequelize.sync({ force: true }).then((err) => {
     }).catch((err) => {
         console.log("Failed to load departments");
         console.log(err);
-    }).finally(console.log("Leaving departments seeder"));
+    })
 
     //-----------------------------------------------------------
     // LOADING ROLE SEEDS || IMPORTANT
@@ -62,20 +67,24 @@ db.sequelize.sync({ force: true }).then((err) => {
     }).catch((err) => {
         console.log("Failed to load roles");
         console.log(err);
-    }).finally(console.log("Leaving roles seeder"));
+    })
 
     //-----------------------------------------------------------
     // LOADING EMPLOYEE SEEDS (EXAMPLE EMPLOYEES) 
     function loadExampleEmployees() {
         db.employee.bulkCreate(employeeSeeds, {}).then(() => {
             console.log("Employee seeds loaded");
+            console.log(" ");
+            console.log("*******************************************");
+            console.log("ALL SEED DATA HAS BEEN UPLOADED!");
+            console.log("*******************************************");
         }).catch((err) => {
             console.log("Failed to load employees");
             console.log(err);
-        }).finally(console.log("Leaving employee seeder"));
+        })
     }
 
-    setTimeout(loadExampleEmployees, 5000);
+    setTimeout(loadExampleEmployees, 2000);
 });
 
 
